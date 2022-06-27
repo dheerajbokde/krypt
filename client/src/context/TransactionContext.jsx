@@ -26,14 +26,14 @@ export const TransactionProvider = ({ children }) => {
         setFormData((prevState) => ({ ...prevState, [name]: e.target.value }));
     }
 
-    const getAllTransactions = async() =>{
+    const getAllTransactions = async () => {
         try {
             if (!ethereum) return alert("Please install Metamask");
-            
+
             const transactionContract = getEthereumContract();
             const availableTransactions = await transactionContract.getAllTransactions();
             // console.log("availableTransactions", availableTransactions);
-            
+
             const structuredTransactions = await availableTransactions.map((transaction) => ({
                 addressTo: transaction.receiver,
                 addressFrom: transaction.sender,
@@ -42,11 +42,11 @@ export const TransactionProvider = ({ children }) => {
                 keyword: transaction.keyword,
                 amount: parseInt(transaction.amount._hex) / (10 ** 18)
             }))
-            
-            console.log("structuredTransactions", structuredTransactions);
+
+            // console.log("structuredTransactions", structuredTransactions);
             setTransactions(structuredTransactions);
         } catch (error) {
-            
+
         }
     }
 
@@ -61,7 +61,7 @@ export const TransactionProvider = ({ children }) => {
             if (!ethereum) return alert("Please install Metamask");
 
             const accounts = await ethereum.request({ method: 'eth_accounts' });
-            console.log(accounts);
+            //console.log(accounts);
             if (accounts.length) {
                 setCurrentAccount(accounts[0]);
                 //getAllTransactions();
@@ -80,6 +80,20 @@ export const TransactionProvider = ({ children }) => {
             if (!ethereum) return alert("Please install Metamask");
             const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
             setCurrentAccount(accounts[0]);
+            window.location.reload();
+        } catch (error) {
+            console.log(error);
+            throw new Error("No ethereum object");
+        }
+    }
+
+    const logout = async () => {
+        try {
+            if (ethereum) {
+                setCurrentAccount('');
+                window.localStorage.clear();
+                window.location.reload();
+            }
         } catch (error) {
             console.log(error);
             throw new Error("No ethereum object");
@@ -117,15 +131,15 @@ export const TransactionProvider = ({ children }) => {
             // update transaction count
             const transactionCount = await transactionContract.getTransactionCount();
             setTransactionCount(transactionCount.toNumber());
-            
-            window.reload();
+
+            window.location.reload();
         } catch (error) {
             console.log(error);
             throw new Error("No ethereum object");
         }
     }
 
-    const checkIfTransactionsExists = async() => {
+    const checkIfTransactionsExists = async () => {
         try {
             const transactionContract = getEthereumContract();
             const transactionCount = await transactionContract.getTransactionCount();

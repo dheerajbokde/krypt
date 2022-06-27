@@ -1,4 +1,8 @@
 const main = async() => {
+  const [deployer] = await ethers.getSigners();
+  console.log("Deploying contracts with the account:", deployer.address);
+  console.log("Account balance:", (await deployer.getBalance()).toString());
+
   const Transactions = await hre.ethers.getContractFactory("Transactions");
   const transactions = await Transactions.deploy();
 
